@@ -5,6 +5,7 @@ import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Server;
 import javafx.application.Application;
 import javafx.stage.Stage;
+import sample.game.Player;
 
 import java.util.ArrayList;
 import java.util.HashMap;

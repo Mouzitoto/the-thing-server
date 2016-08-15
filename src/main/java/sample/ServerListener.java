@@ -2,7 +2,7 @@ package sample;
 
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
-import com.sun.org.apache.xpath.internal.SourceTree;
+import sample.game.Player;
 
 /**
  * Created by ruslan.babich on 26.07.2016.
