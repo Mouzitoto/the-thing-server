@@ -20,6 +20,7 @@ public class ServerListener extends Listener {
 
                 Player player = new Player();
                 player.setName(message.getPlayer().getName());
+                //todo: add playerID from message to player
 
                 //if it is the first person in lobby
                 if (Main.players.size() == 0)
@@ -50,6 +51,24 @@ public class ServerListener extends Listener {
                         + connection.getRemoteAddressTCP().getHostString() + " "
                         + message.getPlayer().getName());
 
+                broadcastAll(message);
+            }
+
+            //PLAYER QUIT
+            if (message.getType().equals(NetworkMessage.PLAYER_QUIT)) {
+                System.out.println(NetworkMessage.PLAYER_QUIT + " received from "
+                        + connection.getRemoteAddressTCP().getHostString() + " "
+                        + message.getPlayer().getName());
+
+                for (int i = 0; i < Main.players.size(); i++)
+                    if (Main.players.get(i).getName().equals(message.getPlayer().getName()))
+                        Main.players.remove(i);
+
+                //if gameOwner quits, then set new gameOwner
+                if (message.getPlayer().isGameOwner())
+                    Main.players.get(0).setGameOwner(true);
+
+                message.setPlayers(Main.players);
                 broadcastAll(message);
             }
         }

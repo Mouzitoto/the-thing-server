@@ -1,9 +1,14 @@
 package sample;
 
 import com.esotericsoftware.kryo.Kryo;
+import com.esotericsoftware.kryo.serializers.JavaSerializer;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Server;
+import com.sun.javafx.binding.ExpressionHelper;
+import com.sun.javafx.binding.ExpressionHelperBase;
 import javafx.application.Application;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.geometry.Point2D;
 import javafx.stage.Stage;
 import sample.game.Player;
 
@@ -26,6 +31,8 @@ public class Main extends Application {
         kryo.register(NetworkMessage.class);
         kryo.register(Player.class);
         kryo.register(ArrayList.class);
+        kryo.register(Point2D.class);
+        kryo.register(Class.class);
 
         server.addListener(new ServerListener());
     }
