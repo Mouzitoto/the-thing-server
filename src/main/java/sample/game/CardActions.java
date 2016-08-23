@@ -29,7 +29,7 @@ public enum CardActions {
     andUCallThisAParty,
     blindDate,
     chainReaction,
-    forgetFulness,
+    forgetfulness,
     goAway,
     letsBeFriends,
     oldRopes,

@@ -3,6 +3,7 @@ package sample;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import sample.game.Player;
+import sample.game.Utils;
 
 /**
  * Created by ruslan.babich on 26.07.2016.
@@ -52,6 +53,8 @@ public class ServerListener extends Listener {
                         + message.getPlayer().getName());
 
                 broadcastAll(message);
+
+                Main.startTheGame();
             }
 
             //PLAYER QUIT

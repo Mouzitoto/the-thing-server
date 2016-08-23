@@ -10,7 +10,7 @@ import javafx.application.Application;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.geometry.Point2D;
 import javafx.stage.Stage;
-import sample.game.Player;
+import sample.game.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -20,6 +20,7 @@ import java.util.Map;
 public class Main extends Application {
     public static List<Player> players = new ArrayList<Player>();
     public static Map<Player, Connection> playerConnections= new HashMap<Player, Connection>();
+    public static List<Card> deck;
 
     @Override
     public void start(Stage primaryStage) throws Exception{
@@ -28,11 +29,15 @@ public class Main extends Application {
         server.bind(27015, 27016);
 
         Kryo kryo = server.getKryo();
-        kryo.register(NetworkMessage.class);
-        kryo.register(Player.class);
-        kryo.register(ArrayList.class);
-        kryo.register(Point2D.class);
-        kryo.register(Class.class);
+        kryo.register(NetworkMessage.class, 111);
+        kryo.register(Player.class, 112);
+        kryo.register(ArrayList.class, 113);
+        kryo.register(Point2D.class, 114);
+        kryo.register(Card.class, 115);
+//        kryo.register(CardTypes.class, 116);
+        kryo.register(CardActions.class, 117);
+
+
 
         server.addListener(new ServerListener());
     }
@@ -40,5 +45,10 @@ public class Main extends Application {
     public static void main(String[] args) {
         System.out.println("Server started");
         launch(args);
+    }
+
+    public static void startTheGame() {
+        deck = Utils.createDeck(players.size());
+        deck = Utils.give4CardsToPlayers(deck, players.size());
     }
 }
