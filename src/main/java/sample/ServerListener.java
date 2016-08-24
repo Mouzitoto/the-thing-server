@@ -67,13 +67,17 @@ public class ServerListener extends Listener {
     public void disconnected (Connection connection) {
         super.disconnected(connection);
 
+        if (Main.playerConnections.size() == 0)
+            return;
+
         Iterator it = Main.playerConnections.entrySet().iterator();
         while (it.hasNext()) {
             Map.Entry pair = (Map.Entry)it.next();
             if (connection.getID() == ((Connection) pair.getValue()).getID()) {
                 Main.players.remove(pair.getKey());
                 if (((Player) pair.getKey()).isGameOwner())
-                    Main.players.get(0).setGameOwner(true);
+                    if(Main.players.size() > 0)
+                        Main.players.get(0).setGameOwner(true);
                 it.remove();
             }
         }
