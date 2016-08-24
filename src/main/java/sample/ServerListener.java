@@ -5,6 +5,9 @@ import com.esotericsoftware.kryonet.Listener;
 import sample.game.Player;
 import sample.game.Utils;
 
+import java.util.Iterator;
+import java.util.Map;
+
 /**
  * Created by ruslan.babich on 26.07.2016.
  */
@@ -56,27 +59,32 @@ public class ServerListener extends Listener {
 
                 Main.startTheGame();
             }
-
-            //PLAYER QUIT
-            if (message.getType().equals(NetworkMessage.PLAYER_QUIT)) {
-                System.out.println(NetworkMessage.PLAYER_QUIT + " received from "
-                        + connection.getRemoteAddressTCP().getHostString() + " "
-                        + message.getPlayer().getName());
-
-                for (int i = 0; i < Main.players.size(); i++)
-                    if (Main.players.get(i).getName().equals(message.getPlayer().getName()))
-                        Main.players.remove(i);
-
-                //if gameOwner quits, then set new gameOwner
-                if (message.getPlayer().isGameOwner())
-                    Main.players.get(0).setGameOwner(true);
-
-                message.setPlayers(Main.players);
-                broadcastAll(message);
-            }
         }
 
     }
+
+    @Override
+    public void disconnected (Connection connection) {
+        super.disconnected(connection);
+
+        Iterator it = Main.playerConnections.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry pair = (Map.Entry)it.next();
+            if (connection.getID() == ((Connection) pair.getValue()).getID()) {
+                Main.players.remove(pair.getKey());
+                if (((Player) pair.getKey()).isGameOwner())
+                    Main.players.get(0).setGameOwner(true);
+                it.remove();
+            }
+        }
+
+        NetworkMessage message = new NetworkMessage();
+        message.setType(NetworkMessage.PLAYER_QUIT);
+        message.setPlayers(Main.players);
+        broadcastAll(message);
+
+    }
+
 
     public void broadcast(NetworkMessage message, Connection connection) {
         System.out.println("broadcasting...");
