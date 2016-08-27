@@ -13,6 +13,19 @@ public class Utils {
     public static final String CARD_TYPE_EVENT = "event";
     public static final String CARD_TYPE_PANIC = "panic";
 
+    public static void setNextMovingPlayerName() {
+        for (int i = 0; i < Main.alivePlayers.size(); i++) {
+            Player player = Main.alivePlayers.get(i);
+            if (player.getName().equals(Main.nowMovingPlayerName)){
+                if (i != Main.alivePlayers.size() -1){
+                    Main.nowMovingPlayerName = Main.alivePlayers.get(i + 1).getName();
+                } else {
+                    Main.nowMovingPlayerName = Main.alivePlayers.get(0).getName();
+                }
+            }
+        }
+    }
+
     public static List<Card> createDeck(int playersCount) {
         List<Card> fullDeck = createFullDeck();
         List<Card> deck = new ArrayList<Card>();

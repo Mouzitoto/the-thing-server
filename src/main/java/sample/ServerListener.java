@@ -57,9 +57,12 @@ public class ServerListener extends Listener {
                         + message.getPlayer().getName());
 
                 Main.alivePlayers = new ArrayList<Player>(Main.players);
+                Main.nowMovingPlayerName = Main.alivePlayers.get(0).getName();
 
+                message.setNowMovingPlayerName(Main.nowMovingPlayerName);
                 message.setPlayers(Main.players);
                 message.setAlivePlayers(Main.alivePlayers);
+
 
                 broadcastAll(message);
 

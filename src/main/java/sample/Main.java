@@ -23,6 +23,7 @@ public class Main extends Application {
     public static Map<Player, Connection> playerConnections= new HashMap<Player, Connection>();
     public static int moveDirection = 1;
     public static List<Card> deck;
+    public static String nowMovingPlayerName;
 
     @Override
     public void start(Stage primaryStage) throws Exception{
