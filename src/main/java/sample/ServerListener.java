@@ -5,6 +5,7 @@ import com.esotericsoftware.kryonet.Listener;
 import sample.game.Player;
 import sample.game.Utils;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -55,7 +56,10 @@ public class ServerListener extends Listener {
                         + connection.getRemoteAddressTCP().getHostString() + " "
                         + message.getPlayer().getName());
 
+                Main.alivePlayers = new ArrayList<Player>(Main.players);
+
                 message.setPlayers(Main.players);
+                message.setAlivePlayers(Main.alivePlayers);
 
                 broadcastAll(message);
 
