@@ -55,6 +55,8 @@ public class ServerListener extends Listener {
                         + connection.getRemoteAddressTCP().getHostString() + " "
                         + message.getPlayer().getName());
 
+                message.setPlayers(Main.players);
+
                 broadcastAll(message);
 
                 Main.startTheGame();
