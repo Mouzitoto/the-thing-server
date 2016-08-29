@@ -68,6 +68,16 @@ public class ServerListener extends Listener {
 
                 Main.startTheGame();
             }
+
+            //GET CARD FROM DECK
+            if (message.getType().equals(NetworkMessage.GET_CARD_FROM_DECK)) {
+                System.out.println(NetworkMessage.GET_CARD_FROM_DECK + " received from "
+                        + connection.getRemoteAddressTCP().getHostString() + " "
+                        + message.getPlayer().getName());
+
+
+                Main.deck = Utils.giveCardToPlayer(Main.deck, findPlayerByConnection(connection));
+            }
         }
 
     }
@@ -79,17 +89,25 @@ public class ServerListener extends Listener {
         if (Main.playerConnections.size() == 0)
             return;
 
-        Iterator it = Main.playerConnections.entrySet().iterator();
-        while (it.hasNext()) {
-            Map.Entry pair = (Map.Entry)it.next();
-            if (connection.getID() == ((Connection) pair.getValue()).getID()) {
-                Main.players.remove(pair.getKey());
-                if (((Player) pair.getKey()).isGameOwner())
-                    if(Main.players.size() > 0)
-                        Main.players.get(0).setGameOwner(true);
-                it.remove();
-            }
-        }
+        Player player = findPlayerByConnection(connection);
+        Main.players.remove(player);
+        Main.playerConnections.remove(player);
+
+        if (player.isGameOwner())
+            if (Main.players.size() > 0)
+                Main.players.get(0).setGameOwner(true);
+
+//        Iterator it = Main.playerConnections.entrySet().iterator();
+//        while (it.hasNext()) {
+//            Map.Entry pair = (Map.Entry)it.next();
+//            if (connection.getID() == ((Connection) pair.getValue()).getID()) {
+//                Main.players.remove(pair.getKey());
+//                if (((Player) pair.getKey()).isGameOwner())
+//                    if(Main.players.size() > 0)
+//                        Main.players.get(0).setGameOwner(true);
+//                it.remove();
+//            }
+//        }
 
         NetworkMessage message = new NetworkMessage();
         message.setType(NetworkMessage.PLAYER_QUIT);
@@ -116,4 +134,17 @@ public class ServerListener extends Listener {
             System.out.println("message was sent to " + Main.playerConnections.get(player).getRemoteAddressTCP().getHostString() + " " + player.getName());
         }
     }
+
+    public Player findPlayerByConnection(Connection connection) {
+        Iterator it = Main.playerConnections.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry pair = (Map.Entry) it.next();
+            if (connection.getID() == ((Connection) pair.getValue()).getID()) {
+                return (Player) pair.getKey();
+            }
+        }
+
+        return null;
+    }
+
 }
