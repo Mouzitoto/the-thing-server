@@ -1,7 +1,7 @@
 package sample.game;
 
 import sample.Main;
-import sample.NetworkMessage;
+import sample.network.NetworkMessage;
 
 import java.util.*;
 

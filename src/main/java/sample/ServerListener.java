@@ -4,6 +4,7 @@ import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import sample.game.Player;
 import sample.game.Utils;
+import sample.network.NetworkMessage;
 
 import java.util.ArrayList;
 import java.util.Iterator;

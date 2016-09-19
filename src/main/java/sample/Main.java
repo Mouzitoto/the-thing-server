@@ -1,16 +1,25 @@
 package sample;
 
-import com.esotericsoftware.kryo.Kryo;
-import com.esotericsoftware.kryo.serializers.JavaSerializer;
 import com.esotericsoftware.kryonet.Connection;
-import com.esotericsoftware.kryonet.Server;
-import com.sun.javafx.binding.ExpressionHelper;
-import com.sun.javafx.binding.ExpressionHelperBase;
 import javafx.application.Application;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.geometry.Point2D;
 import javafx.stage.Stage;
 import sample.game.*;
+import io.netty.bootstrap.ServerBootstrap;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelPipeline;
+import io.netty.channel.EventLoopGroup;
+import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.SocketChannel;
+import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.codec.serialization.ClassResolvers;
+import io.netty.handler.codec.serialization.ObjectDecoder;
+import io.netty.handler.codec.serialization.ObjectEncoder;
+import io.netty.handler.logging.LogLevel;
+import io.netty.handler.logging.LoggingHandler;
+import io.netty.handler.ssl.SslContext;
+import io.netty.handler.ssl.SslContextBuilder;
+import io.netty.handler.ssl.util.SelfSignedCertificate;
+import sample.network.NetworkServer;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,25 +33,12 @@ public class Main extends Application {
     public static int moveDirection = 1;
     public static List<Card> deck;
     public static String nowMovingPlayerName;
+    public static NetworkServer server;
+
 
     @Override
     public void start(Stage primaryStage) throws Exception{
-        Server server = new Server();
-        server.start();
-        server.bind(27015, 27016);
-
-        Kryo kryo = server.getKryo();
-        kryo.register(NetworkMessage.class, 111);
-        kryo.register(Player.class, 112);
-        kryo.register(ArrayList.class, 113);
-        kryo.register(Point2D.class, 114);
-        kryo.register(Card.class, 115);
-//        kryo.register(CardTypes.class, 116);
-        kryo.register(CardActions.class, 117);
-
-
-
-        server.addListener(new ServerListener());
+        server = new NetworkServer().start();
     }
 
     public static void main(String[] args) {
