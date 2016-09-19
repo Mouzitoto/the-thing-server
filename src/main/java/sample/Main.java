@@ -1,6 +1,7 @@
 package sample;
 
 import com.esotericsoftware.kryonet.Connection;
+import io.netty.channel.Channel;
 import javafx.application.Application;
 import javafx.stage.Stage;
 import sample.game.*;
@@ -14,7 +15,7 @@ import java.util.Map;
 public class Main extends Application {
     public static List<Player> players = new ArrayList<Player>();
     public static List<Player> alivePlayers;
-    public static Map<Player, Connection> playerConnections= new HashMap<Player, Connection>();
+    public static Map<Player, Channel> playerConnections= new HashMap<Player, Channel>();
     public static int moveDirection = 1;
     public static List<Card> deck;
     public static String nowMovingPlayerName;

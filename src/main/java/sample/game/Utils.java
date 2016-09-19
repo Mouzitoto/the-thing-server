@@ -48,7 +48,7 @@ public class Utils {
         message.setType(NetworkMessage.GET_CARD_FROM_DECK);
         message.setCard(deck.get(0));
 
-        Main.playerConnections.get(player).sendTCP(message);
+        Main.playerConnections.get(player).writeAndFlush(message);
 
         List<Card> deckWithout1Card = new ArrayList<Card>(deck);
         deckWithout1Card.remove(0);
