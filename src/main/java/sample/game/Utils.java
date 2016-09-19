@@ -49,6 +49,7 @@ public class Utils {
         message.setCard(deck.get(0));
 
         Main.playerConnections.get(player).writeAndFlush(message);
+        System.out.println("'" + message.getType() + "' was sent to " + player.getName());
 
         List<Card> deckWithout1Card = new ArrayList<Card>(deck);
         deckWithout1Card.remove(0);

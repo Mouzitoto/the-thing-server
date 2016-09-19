@@ -6,6 +6,7 @@ import sample.Main;
 import sample.game.Player;
 
 import java.net.InetSocketAddress;
+import java.util.ArrayList;
 
 /**
  * Created by ruslan.babich on 019 19.09.2016.
@@ -18,7 +19,9 @@ public class NetworkServerHandler extends ChannelInboundHandlerAdapter {
             String host = ((InetSocketAddress) ctx.channel().remoteAddress()).getAddress().getHostAddress();
             String playerName = message.getPlayer().getName();
 
-            //HandShake
+            //HANDSHAKE
+            //HANDSHAKE
+            //HANDSHAKE
             if (message.getType().equals(NetworkMessage.HANDSHAKE)) {
                 System.out.println(message.getType() + " received from " + host + " " + playerName);
 
@@ -40,9 +43,29 @@ public class NetworkServerHandler extends ChannelInboundHandlerAdapter {
                 broadcastAll(messageOut);
             }
 
-            //Send message to chat window
+            //SEND CHAT MESSAGE
+            //SEND CHAT MESSAGE
+            //SEND CHAT MESSAGE
             if (message.getType().equals(NetworkMessage.SEND_CHAT_MESSAGE)) {
                 System.out.println(message.getType() + " received from " + host + " " + playerName);
+
+                broadcastAll(message);
+            }
+
+            //START GAME
+            //START GAME
+            //START GAME
+            if (message.getType().equals(NetworkMessage.START_GAME)) {
+                System.out.println(message.getType() + " received from " + host + " " + playerName);
+
+                Main.alivePlayers = new ArrayList<Player>(Main.players);
+                Main.nowMovingPlayerName = Main.alivePlayers.get(0).getName();
+
+                message.setNowMovingPlayerName(Main.nowMovingPlayerName);
+                message.setPlayers(Main.players);
+                message.setAlivePlayers(Main.alivePlayers);
+
+                Main.startTheGame();
 
                 broadcastAll(message);
             }
