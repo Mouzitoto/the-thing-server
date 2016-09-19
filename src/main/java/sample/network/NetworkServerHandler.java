@@ -39,11 +39,18 @@ public class NetworkServerHandler extends ChannelInboundHandlerAdapter {
 
                 broadcastAll(messageOut);
             }
+
+            //Send message to chat window
+            if (message.getType().equals(NetworkMessage.SEND_CHAT_MESSAGE)) {
+                System.out.println(message.getType() + " received from " + host + " " + playerName);
+
+                broadcastAll(message);
+            }
         }
     }
 
     public void broadcastAll(NetworkMessage message) {
-        System.out.println("broadcasting to all...");
+        System.out.println("broadcasting '" + message.getType() + "' to all...");
         for (Player player : Main.players) {
             Main.playerConnections.get(player).writeAndFlush(message);
             String host = ((InetSocketAddress) Main.playerConnections.get(player).remoteAddress()).getAddress().getHostAddress();
