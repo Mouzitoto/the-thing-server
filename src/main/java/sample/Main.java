@@ -14,12 +14,13 @@ import java.util.Map;
 
 public class Main extends Application {
     public static List<Player> players = new ArrayList<Player>();
-    public static List<Player> alivePlayers;
+//    public static List<Player> alivePlayers = new ArrayList<Player>();
     public static Map<Player, Channel> playerConnections= new HashMap<Player, Channel>();
     public static int moveDirection = 1;
     public static List<Card> deck;
     public static String nowMovingPlayerName;
     public static NetworkServer server;
+    public static boolean isGameStarted = false;
 
 
     @Override

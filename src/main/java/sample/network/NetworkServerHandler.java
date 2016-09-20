@@ -1,12 +1,18 @@
 package sample.network;
 
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import sample.Main;
+import sample.game.CardTypes;
 import sample.game.Player;
+import sample.game.Utils;
 
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by ruslan.babich on 019 19.09.2016.
@@ -58,28 +64,80 @@ public class NetworkServerHandler extends ChannelInboundHandlerAdapter {
             if (message.getType().equals(NetworkMessage.START_GAME)) {
                 System.out.println(message.getType() + " received from " + host + " " + playerName);
 
-                Main.alivePlayers = new ArrayList<Player>(Main.players);
-                Main.nowMovingPlayerName = Main.alivePlayers.get(0).getName();
+//                Main.alivePlayers = new ArrayList<Player>(Main.players);
+
+                Main.nowMovingPlayerName = Main.players.get(0).getName();
 
                 message.setNowMovingPlayerName(Main.nowMovingPlayerName);
                 message.setPlayers(Main.players);
-                message.setAlivePlayers(Main.alivePlayers);
-
-                Main.startTheGame();
+//                message.setAlivePlayers(Main.alivePlayers);
 
                 broadcastAll(message);
+            }
+
+            //NEW PLAYER POSITIONS
+            if (message.getType().equals(NetworkMessage.NEW_PLAYER_POSITIONS)) {
+                System.out.println(message.getType() + " received from " + host + " " + playerName);
+
+                for (Player player : message.getPlayers())
+                    for (Player p : Main.players)
+                        if (p.getName().equals(player.getName()))
+                            p.setTabletopPosition(player.getTabletopPosition());
+
+                if (!Main.isGameStarted) {
+                    Main.isGameStarted = true;
+                    Main.startTheGame();
+                }
+            }
+
+
+            //GET CARD FROM DECK
+            //GET CARD FROM DECK
+            //GET CARD FROM DECK
+            if (message.getType().equals(NetworkMessage.GET_CARD_FROM_DECK)) {
+                System.out.println(message.getType() + " received from " + host + " " + playerName);
+
+                if (Main.deck.get(0).getType().equals(CardTypes.event.name())) {
+                    Main.deck = Utils.giveCardToPlayer(Main.deck, Utils.findPlayerByConnection(ctx));
+                    //send to others that player has +1 event card
+                    message.setType(NetworkMessage.OTHER_PLAYER_GET_EVENT_CARD_FROM_DECK);
+                    message.setPlayers(Main.players);
+                    broadcastAllExceptMe(message, ctx);
+                } else {
+                    //send to others that player has +1 panic card
+                    message.setType(NetworkMessage.OTHER_PLAYER_GET_PANIC_CARD_FROM_DECK);
+                    message.setCard(Main.deck.get(0));
+                    broadcastAllExceptMe(message, ctx);
+                    //send that card to player (now moving)
+                    Main.deck = Utils.giveCardToPlayer(Main.deck, Utils.findPlayerByConnection(ctx));
+                }
+
+
+                //todo: if cardType == event, then broadcast all, that he has +1 card in hand
             }
         }
     }
 
     public void broadcastAll(NetworkMessage message) {
-        System.out.println("broadcasting '" + message.getType() + "' to all...");
+        System.out.println("broadcasting all '" + message.getType() + "' to all...");
         for (Player player : Main.players) {
             Main.playerConnections.get(player).writeAndFlush(message);
             String host = ((InetSocketAddress) Main.playerConnections.get(player).remoteAddress()).getAddress().getHostAddress();
             System.out.println("    message was sent to " + host + " " + player.getName());
         }
     }
+
+    public void broadcastAllExceptMe(NetworkMessage message, ChannelHandlerContext ctx) {
+        System.out.println("broadcasting all '" + message.getType() + "' to all except me...");
+        for (Player player : Main.players) {
+            if (Main.playerConnections.get(player).id() != ctx.channel().id()) {
+                Main.playerConnections.get(player).writeAndFlush(message);
+                String host = ((InetSocketAddress) Main.playerConnections.get(player).remoteAddress()).getAddress().getHostAddress();
+                System.out.println("    message was sent to " + host + " " + player.getName());
+            }
+        }
+    }
+
 
     @Override
     public void channelReadComplete(ChannelHandlerContext ctx) {

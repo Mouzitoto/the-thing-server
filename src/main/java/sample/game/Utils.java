@@ -1,5 +1,8 @@
 package sample.game;
 
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelHandlerContext;
+import javafx.application.Platform;
 import sample.Main;
 import sample.network.NetworkMessage;
 
@@ -14,13 +17,13 @@ public class Utils {
     public static final String CARD_TYPE_PANIC = "panic";
 
     public static void setNextMovingPlayerName() {
-        for (int i = 0; i < Main.alivePlayers.size(); i++) {
-            Player player = Main.alivePlayers.get(i);
+        for (int i = 0; i < Main.players.size(); i++) {
+            Player player = Main.players.get(i);
             if (player.getName().equals(Main.nowMovingPlayerName)){
-                if (i != Main.alivePlayers.size() -1){
-                    Main.nowMovingPlayerName = Main.alivePlayers.get(i + 1).getName();
+                if (i != Main.players.size() -1){
+                    Main.nowMovingPlayerName = Main.players.get(i + 1).getName();
                 } else {
-                    Main.nowMovingPlayerName = Main.alivePlayers.get(0).getName();
+                    Main.nowMovingPlayerName = Main.players.get(0).getName();
                 }
             }
         }
@@ -44,8 +47,12 @@ public class Utils {
     }
 
     public static List<Card> giveCardToPlayer(List<Card> deck, Player player) {
+        player.setHandCardsCount(player.getHandCardsCount() + 1);
+
+        //send card to player
         NetworkMessage message = new NetworkMessage();
         message.setType(NetworkMessage.GET_CARD_FROM_DECK);
+        message.setPlayer(player);
         message.setCard(deck.get(0));
 
         Main.playerConnections.get(player).writeAndFlush(message);
@@ -94,6 +101,14 @@ public class Utils {
             for (int i = 0; i < 4; i++) {
                 preparedDeck = giveCardToPlayer(preparedDeck, player);
             }
+        }
+
+        //send info about player hand cards count to other players
+        for (Player player : Main.players) {
+            NetworkMessage message = new NetworkMessage();
+            message.setType(NetworkMessage.OTHER_PLAYER_GET_EVENT_CARD_FROM_DECK);
+            message.setPlayers(Main.players);
+            Main.playerConnections.get(player).writeAndFlush(message);
         }
 
         //combine remaining cards with infection and panic
@@ -297,5 +312,16 @@ public class Utils {
         return comparator;
     }
 
+    public static Player findPlayerByConnection(ChannelHandlerContext ctx) {
+        Iterator it = Main.playerConnections.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry pair = (Map.Entry) it.next();
+            if (ctx.channel().id() == ((Channel) pair.getValue()).id()) {
+                return (Player) pair.getKey();
+            }
+        }
+
+        return null;
+    }
 
 }
