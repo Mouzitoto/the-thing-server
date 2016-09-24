@@ -67,6 +67,7 @@ public class NetworkServerHandler extends ChannelInboundHandlerAdapter {
 //                Main.alivePlayers = new ArrayList<Player>(Main.players);
 
                 Main.nowMovingPlayerName = Main.players.get(0).getName();
+                Main.isAbleToGetCard = true;
 
                 message.setNowMovingPlayerName(Main.nowMovingPlayerName);
                 message.setPlayers(Main.players);
@@ -97,23 +98,24 @@ public class NetworkServerHandler extends ChannelInboundHandlerAdapter {
             if (message.getType().equals(NetworkMessage.GET_CARD_FROM_DECK)) {
                 System.out.println(message.getType() + " received from " + host + " " + playerName);
 
-                if (Main.deck.get(0).getType().equals(CardTypes.event.name())) {
-                    Main.deck = Utils.giveCardToPlayer(Main.deck, Utils.findPlayerByConnection(ctx));
-                    //send to others that player has +1 event card
-                    message.setType(NetworkMessage.OTHER_PLAYER_GET_EVENT_CARD_FROM_DECK);
-                    message.setPlayers(Main.players);
-                    broadcastAllExceptMe(message, ctx);
-                } else {
-                    //send to others that player has +1 panic card
-                    message.setType(NetworkMessage.OTHER_PLAYER_GET_PANIC_CARD_FROM_DECK);
-                    message.setCard(Main.deck.get(0));
-                    broadcastAllExceptMe(message, ctx);
-                    //send that card to player (now moving)
-                    Main.deck = Utils.giveCardToPlayer(Main.deck, Utils.findPlayerByConnection(ctx));
+                if (message.getPlayer().getName().equals(Main.nowMovingPlayerName) && Main.isAbleToGetCard) {
+                    if (Main.deck.get(0).getType().equals(CardTypes.event.name())) {
+                        //send event card to player (now moving)
+                        Main.deck = Utils.giveCardToPlayer(Main.deck, Utils.findPlayerByConnection(ctx));
+                        //send to others that player has +1 event card
+                        message.setType(NetworkMessage.OTHER_PLAYER_GET_EVENT_CARD_FROM_DECK);
+                        message.setPlayers(Main.players);
+                        broadcastAllExceptMe(message, ctx);
+                    } else {
+                        //send panic card to player (now moving)
+                        Main.deck = Utils.giveCardToPlayer(Main.deck, Utils.findPlayerByConnection(ctx));
+                        //send to others that player has +1 panic card
+                        message.setType(NetworkMessage.OTHER_PLAYER_GET_PANIC_CARD_FROM_DECK);
+                        message.setCard(Main.deck.get(0));
+                        broadcastAllExceptMe(message, ctx);
+                    }
+                    Main.isAbleToGetCard = false;
                 }
-
-
-                //todo: if cardType == event, then broadcast all, that he has +1 card in hand
             }
         }
     }

@@ -21,6 +21,7 @@ public class Main extends Application {
     public static String nowMovingPlayerName;
     public static NetworkServer server;
     public static boolean isGameStarted = false;
+    public static boolean isAbleToGetCard = false;
 
 
     @Override
