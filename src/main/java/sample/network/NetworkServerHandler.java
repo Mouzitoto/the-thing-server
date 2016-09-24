@@ -49,6 +49,41 @@ public class NetworkServerHandler extends ChannelInboundHandlerAdapter {
                 broadcastAll(messageOut);
             }
 
+            //PLAYER QUIT
+            //PLAYER QUIT
+            //PLAYER QUIT
+            if (message.getType().equals(NetworkMessage.PLAYER_QUIT)) {
+                System.out.println(message.getType() + " received from " + host + " " + playerName);
+
+                //if he was moving now, set new nowMovingPlayerName
+                if (message.getPlayer().getName().equals(Main.nowMovingPlayerName))
+                    if (Main.players.size() > 1) //more than one player
+                        for (int i = 0; i < Main.players.size(); i++) {
+                            if (Main.players.get(i).getName().equals(message.getPlayer().getName())){
+                                if (i == Main.players.size() - 1)
+                                    Main.nowMovingPlayerName = Main.players.get(0).getName();
+                                else
+                                    Main.nowMovingPlayerName = Main.players.get(i + 1).getName();
+                            }
+                        }
+
+
+                //remove player from players array
+                for (int i = 0; i < Main.players.size(); i++)
+                    if (Main.players.get(i).getName().equals(message.getPlayer().getName()))
+                        Main.players.remove(i);
+
+                //if he was the gameOwner, then set new gameOwner
+                if (message.getPlayer().isGameOwner())
+                    if (Main.players.size() > 0)
+                        Main.players.get(0).setGameOwner(true);
+
+
+                message.setPlayers(Main.players);
+                broadcastAll(message);
+            }
+
+
             //SEND CHAT MESSAGE
             //SEND CHAT MESSAGE
             //SEND CHAT MESSAGE
